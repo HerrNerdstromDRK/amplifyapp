@@ -18,5 +18,4 @@ function App() {
     </Authenticator>
   );
 }
-
 export default App;
