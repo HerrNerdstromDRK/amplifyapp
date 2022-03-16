@@ -1,5 +1,5 @@
 {
-  "features": {
+ "features": {
     "graphqltransformer": {
       "addmissingownerfields": true,
       "improvepluralization": false,
