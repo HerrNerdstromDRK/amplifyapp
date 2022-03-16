@@ -41,5 +41,12 @@
         }
       }
     }
+  },
+  "storage": {
+    "AmplifyAppStorageBucket": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
+    }
   }
 }
