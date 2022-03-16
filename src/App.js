@@ -10,7 +10,6 @@ import { listNotes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations.js'
 
 import '@aws-amplify/ui-react/styles.css';
-
 import awsExports from './aws-exports';
 Amplify.configure(awsExports);
 
