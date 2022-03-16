@@ -26,7 +26,6 @@ export default function App() {
   async function fetchNotes() {
     const apiData = await API.graphql({ query: listNotes });
     setNotes(apiData.data.listNotes.items);
-    console.log( notes ) ;
   }
 
   async function createNote() {
