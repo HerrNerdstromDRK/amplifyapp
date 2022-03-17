@@ -78,6 +78,11 @@ function App({ signOut, user }) {
               </Text>
     	   <Divider /> 
       <Text>
+		
+
+
+		  </Text>
+		  <Divider />
       <input
         onChange={e => setFormData({ ...formData, 'name': e.target.value})}
         placeholder="Note name"
