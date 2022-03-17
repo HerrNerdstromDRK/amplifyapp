@@ -5,7 +5,9 @@ import './App.css';
 import { Amplify } from 'aws-amplify';
 import { API, Storage } from 'aws-amplify';
 
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator, withAuthenticator, /*useAuthenticator*/ } from '@aws-amplify/ui-react';
+import { Flex, Text, Divider } from '@aws-amplify/ui-react';
+
 import { listNotes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations.js'
 
@@ -15,7 +17,7 @@ Amplify.configure(awsExports);
 
 const initialFormState = { name: '', description: '' }
 
-export default function App() {
+function App({ signOut, user }) {
   const [notes, setNotes] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
 
@@ -63,9 +65,19 @@ export default function App() {
   
   return (
     <Authenticator>
-      {({ signOut, user }) => (
-            <div className="App">
-              <h1>My Notes App</h1>
+     {({ signOut, user }) => (
+	<>
+      <div className="App">
+	      <Flex direction="column">
+	      	<Text>
+              <h1>Yoda Blog</h1>
+              Welcome {user.username}!
+              <p>
+              <button onClick={signOut}>Sign Out</button>
+              </p>
+              </Text>
+    	   <Divider /> 
+      <Text>
       <input
         onChange={e => setFormData({ ...formData, 'name': e.target.value})}
         placeholder="Note name"
@@ -81,6 +93,9 @@ export default function App() {
 	  	onChange={onChange}
 	  />
       <button onClick={createNote}>Create Note</button>
+      </Text>
+      <Divider />
+      <Text>
       <div style={{marginBottom: 30}}>
 		{
 		  notes.map(note => (
@@ -89,14 +104,19 @@ export default function App() {
 		      <p>{note.description}</p>
 		      <button onClick={() => deleteNote(note)}>Delete note</button>
 		      {
-		        note.image && <img src={note.image} style={{width: 400}} />
+		        note.image && <img src={note.image} style={{width: 400}} alt="" />
 		      }
 		    </div>
 		  ))
 		}
       </div>
+
+      </Text>
+      </Flex>
     </div>
+    </>
     )}
     </Authenticator>
   );
 }
+export default withAuthenticator(App)
