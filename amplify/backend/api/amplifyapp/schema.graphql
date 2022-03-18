@@ -16,9 +16,8 @@ type Post @model {
   comments: [Comment] @hasMany
 }
 
-type BlogPost
-  @model
-  @auth(rules: [{ allow: public, operations: [read] }, { allow: owner }]) {
+type BlogPost @model {
+  #  @auth(rules: [{ allow: public, operations: [read] }, { allow: owner }])
   id: ID!
   title: String!
   content: String!

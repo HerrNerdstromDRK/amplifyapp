@@ -86,6 +86,7 @@ function App({ signOut, user })
 		if( !blogFormData.title || !blogFormData.content ) return ;
 		console.log( 'createBlogPost> Going to graphql, blogFormData: ' + blogFormData.content ) ;
 		await API.graphql({ query: createBlogPostMutation, variables: {input: blogFormData }}) ;
+//		await API.graphql({ query: createBlogPostMutation, variables: { input: blogFormData }}) ;
 		setBlogPosts([ ...blogPosts, blogFormData ]) ;
 		console.log( 'createBlogPost> blogPosts: ' + blogPosts ) ;
 		setBlogFormData( blogInitialFormState ) ;
@@ -96,7 +97,7 @@ function App({ signOut, user })
 		console.log( "createNote> name: " + formData.name + ", description: " + formData.description ) ;
 	  if (!formData.name || !formData.description) return;
 	  await API.graphql({ query: createNoteMutation, variables: { input: formData } });
-	  if (formData.image) {
+if (formData.image) {
 	    const image = await Storage.get(formData.image);
 	    formData.image = image;
 	  }
