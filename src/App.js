@@ -41,8 +41,7 @@ function App({ signOut, user }) {
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogFormData, setBlogFormData] = useState(blogInitialFormState);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [updateBlogPostInstance, setUpdateBlogPostInstance] =
-    useState(blogInitialFormState);
+  const [updateId, setUpdateId] = useState(0);
 
   // useEffect() is called whenever the DOM is updated
   // Use it here to refresh our display
@@ -109,19 +108,22 @@ function App({ signOut, user }) {
         ", content: " +
         blogFormData.content +
         ", id: " +
-        updateBlogPostInstance.id
+        updateId
     );
+    const inputVar = {
+      id: updateId,
+      title: blogFormData.title,
+      content: blogFormData.content,
+    };
+
     await API.graphql({
       query: updateBlogPostMutation,
-      variables: {
-        id: updateBlogPostInstance.id,
-        title: updateBlogPostInstance.title,
-        content: updateBlogPostInstance.content,
-      },
+      variables: { input: inputVar },
     });
-    setBlogPosts([...blogPosts, blogFormData]);
+    fetchBlogPosts();
     setBlogFormData(blogInitialFormState);
     setIsUpdate(false);
+    setUpdateId(0);
   }
 
   async function deleteBlogPost({ id }) {
@@ -143,13 +145,16 @@ function App({ signOut, user }) {
    */
   async function initiateBlogPostUpdate(blogPost) {
     console.log(
-      "initiateBlogPostUpdate> blogPost.title: " +
+      "initiateBlogPostUpdate> blogPost.id: " +
+        blogPost.id +
+        ", blogPost.title: " +
         blogPost.title +
         ", blogPost.content: " +
         blogPost.content
     );
     setIsUpdate(true);
-    setUpdateBlogPostInstance(blogPost);
+    setBlogFormData(blogPost);
+    setUpdateId(blogPost.id);
   }
 
   function blogContentTextAreaField(blogPostContent) {
@@ -219,12 +224,21 @@ function App({ signOut, user }) {
               <Heading level={5}>{blogPost.title}</Heading>
 
               <Text as="span">{blogPost.content}</Text>
-              <button onClick={() => deleteBlogPost(blogPost)}>
+              <Button
+                variation="primary"
+                size="small"
+                onClick={() => deleteBlogPost(blogPost)}
+              >
                 Delete Blog Post
-              </button>
-              <button onClick={() => initiateBlogPostUpdate(blogPost)}>
+              </Button>
+              <Button
+                variation="primary"
+                size="small"
+                isDisabled={isUpdate}
+                onClick={() => initiateBlogPostUpdate(blogPost)}
+              >
                 Update Blog Post
-              </button>
+              </Button>
             </Flex>
           </Flex>
         </Card>
@@ -256,25 +270,32 @@ function App({ signOut, user }) {
    * @returns
    */
   const renderCreateOrUpdateBlogView = () => {
-    console.log("renderCreateOrUpdateBlogView, isUpdate: " + isUpdate);
+    console.log("renderCreateOrUpdateBlogView> isUpdate: " + isUpdate);
     if (isUpdate === true) {
       console.log(
-        "renderCreateOrUpdateBlogView> updateBlogPost.title: " +
-          updateBlogPostInstance.title +
-          ", updateBlogPost.content: " +
-          updateBlogPostInstance.content
+        "renderCreateOrUpdateBlogView> updateId: " +
+          updateId +
+          ", blogFormData.title: " +
+          blogFormData.title +
+          ", blogFormData.content: " +
+          blogFormData.content
       );
       return (
         <div className="App">
           <input
             onChange={(e) =>
-              setBlogFormData({ ...blogFormData, title: e.target.value })
+              setBlogFormData({
+                ...blogFormData,
+                title: e.target.value,
+              })
             }
             placeholder="Blog Title"
-            value={updateBlogPostInstance.title}
+            value={blogFormData.title}
           />
-          {blogContentTextAreaField(updateBlogPostInstance.content)}
-          <button onClick={updateBlogPost}>Update Blog Post</button>
+          {blogContentTextAreaField(blogFormData.content)}
+          <Button variation="primary" size="small" onClick={updateBlogPost}>
+            Update Blog Post
+          </Button>
         </div>
       );
     }
@@ -290,7 +311,9 @@ function App({ signOut, user }) {
             value={blogFormData.title}
           />
           {blogContentTextAreaField(blogInitialFormState.content)}
-          <button onClick={createBlogPost}>Create Blog Post</button>
+          <Button variation="primary" size="small" onClick={createBlogPost}>
+            Create Blog Post
+          </Button>
         </div>
       );
     }
