@@ -98,6 +98,35 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
+export const getBlogPost = /* GraphQL */ `
+  query GetBlogPost($id: ID!) {
+    getBlogPost(id: $id) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listBlogPosts = /* GraphQL */ `
+  query ListBlogPosts(
+    $filter: ModelBlogPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBlogPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        title
+        content
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const getComment = /* GraphQL */ `
   query GetComment($id: ID!) {
     getComment(id: $id) {
@@ -176,37 +205,6 @@ export const listNotes = /* GraphQL */ `
         image
         createdAt
         updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const getBlogPost = /* GraphQL */ `
-  query GetBlogPost($id: ID!) {
-    getBlogPost(id: $id) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const listBlogPosts = /* GraphQL */ `
-  query ListBlogPosts(
-    $filter: ModelBlogPostFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBlogPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        title
-        content
-        createdAt
-        updatedAt
-        owner
       }
       nextToken
     }

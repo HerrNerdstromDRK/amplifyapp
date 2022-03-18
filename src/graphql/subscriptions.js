@@ -151,6 +151,39 @@ export const onDeletePost = /* GraphQL */ `
     }
   }
 `;
+export const onCreateBlogPost = /* GraphQL */ `
+  subscription OnCreateBlogPost {
+    onCreateBlogPost {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateBlogPost = /* GraphQL */ `
+  subscription OnUpdateBlogPost {
+    onUpdateBlogPost {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteBlogPost = /* GraphQL */ `
+  subscription OnDeleteBlogPost {
+    onDeleteBlogPost {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateComment = /* GraphQL */ `
   subscription OnCreateComment {
     onCreateComment {
@@ -265,42 +298,6 @@ export const onDeleteNote = /* GraphQL */ `
       image
       createdAt
       updatedAt
-    }
-  }
-`;
-export const onCreateBlogPost = /* GraphQL */ `
-  subscription OnCreateBlogPost($owner: String) {
-    onCreateBlogPost(owner: $owner) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const onUpdateBlogPost = /* GraphQL */ `
-  subscription OnUpdateBlogPost($owner: String) {
-    onUpdateBlogPost(owner: $owner) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const onDeleteBlogPost = /* GraphQL */ `
-  subscription OnDeleteBlogPost($owner: String) {
-    onDeleteBlogPost(owner: $owner) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
     }
   }
 `;

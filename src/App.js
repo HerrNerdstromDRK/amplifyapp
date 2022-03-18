@@ -14,12 +14,14 @@ import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } fr
 import { listBlogPosts } from './graphql/queries' ;
 import { createBlogPost as createBlogPostMutation /*, deleteBlogPost as deleteNoteMutation */ } from './graphql/mutations.js';
 
+import { TextAreaField } from '@aws-amplify/ui-react';
+
 import '@aws-amplify/ui-react/styles.css';
 import awsExports from './aws-exports';
 Amplify.configure(awsExports);
 
 const initialFormState = { name: '', description: '' }
-const blogInitialFormState = { title: '', content: '' }
+const blogInitialFormState = { title: 'Blog Title', content: 'Blog Content' }
 
 function App({ signOut, user })
 {
@@ -84,13 +86,13 @@ function App({ signOut, user })
 	{
 		console.log( 'createBlogPost> title: ' + blogFormData.title + ', content: ' + blogFormData.content ) ;
 		if( !blogFormData.title || !blogFormData.content ) return ;
-		console.log( 'createBlogPost> Going to graphql, blogFormData: ' + blogFormData.content ) ;
+//		console.log( 'createBlogPost> Going to graphql, blogFormData: ' + blogFormData.content ) ;
 		await API.graphql({ query: createBlogPostMutation, variables: {input: blogFormData }}) ;
-//		await API.graphql({ query: createBlogPostMutation, variables: { input: blogFormData }}) ;
 		setBlogPosts([ ...blogPosts, blogFormData ]) ;
-		console.log( 'createBlogPost> blogPosts: ' + blogPosts ) ;
+//		console.log( 'createBlogPost> blogPosts: ' + blogPosts ) ;
 		setBlogFormData( blogInitialFormState ) ;
-		console.log( 'createBlogPost> blogFormData: ' + blogFormData ) ;
+		console.log( 'createBlogPost> blogInitialFormState: {' + blogInitialFormState.title + ', ' + blogInitialFormState.content + '}' ) ;
+		console.log( 'createBlogPost> blogFormData: {' + blogFormData.title + ', ' + blogFormData.content + '}' ) ;
 	}
 
 	async function createNote() {
@@ -111,6 +113,30 @@ if (formData.image) {
     await API.graphql({ query: deleteNoteMutation, variables: { input: { id } }});
   }
   
+ const blogContentTextAreaField = () => {
+	return (
+		<Flex as="form" direction="column">
+			<TextAreaField
+				autoComplete="off"
+				direction="row"
+				defaultValue="Default Blog Content"
+				hasError={false}
+				isDisabled={false}
+				isReadOnly={false}
+				isRequired={false}
+				label="Blog Content"
+				labelHidden={false} 
+				name="blogContent"
+				placeholder="Blog Content Goes Here :)"
+				rows="3"
+				wrap="wrap"
+				resize="vertical"
+				onChange={e => setBlogFormData({ ...blogFormData, 'content': e.currentTarget.value})}
+			/>
+    </Flex>
+	) ;
+}
+
   return (
     <Authenticator>
      {({ signOut, user }) => (
@@ -131,11 +157,8 @@ if (formData.image) {
         placeholder="Blog Title"
         value={blogFormData.title}
       />
-      <input
-        onChange={e => setBlogFormData({ ...blogFormData, 'content': e.target.value})}
-        placeholder="Blog content"
-        value={blogFormData.content}
-      />
+	{ blogContentTextAreaField() }
+
   		<button onClick={createBlogPost}>Create Blog Post</button>
 		  </Text>
 		  <Divider />

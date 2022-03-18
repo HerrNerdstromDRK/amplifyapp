@@ -169,6 +169,48 @@ export const deletePost = /* GraphQL */ `
     }
   }
 `;
+export const createBlogPost = /* GraphQL */ `
+  mutation CreateBlogPost(
+    $input: CreateBlogPostInput!
+    $condition: ModelBlogPostConditionInput
+  ) {
+    createBlogPost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateBlogPost = /* GraphQL */ `
+  mutation UpdateBlogPost(
+    $input: UpdateBlogPostInput!
+    $condition: ModelBlogPostConditionInput
+  ) {
+    updateBlogPost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteBlogPost = /* GraphQL */ `
+  mutation DeleteBlogPost(
+    $input: DeleteBlogPostInput!
+    $condition: ModelBlogPostConditionInput
+  ) {
+    deleteBlogPost(input: $input, condition: $condition) {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createComment = /* GraphQL */ `
   mutation CreateComment(
     $input: CreateCommentInput!
@@ -301,51 +343,6 @@ export const deleteNote = /* GraphQL */ `
       image
       createdAt
       updatedAt
-    }
-  }
-`;
-export const createBlogPost = /* GraphQL */ `
-  mutation CreateBlogPost(
-    $input: CreateBlogPostInput!
-    $condition: ModelBlogPostConditionInput
-  ) {
-    createBlogPost(input: $input, condition: $condition) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const updateBlogPost = /* GraphQL */ `
-  mutation UpdateBlogPost(
-    $input: UpdateBlogPostInput!
-    $condition: ModelBlogPostConditionInput
-  ) {
-    updateBlogPost(input: $input, condition: $condition) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const deleteBlogPost = /* GraphQL */ `
-  mutation DeleteBlogPost(
-    $input: DeleteBlogPostInput!
-    $condition: ModelBlogPostConditionInput
-  ) {
-    deleteBlogPost(input: $input, condition: $condition) {
-      id
-      title
-      content
-      createdAt
-      updatedAt
-      owner
     }
   }
 `;
