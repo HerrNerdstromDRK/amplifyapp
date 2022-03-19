@@ -7,6 +7,16 @@
   pointer-events: none;
 }
 
+@media (prefers-color-scheme: dark) {
+  [data-amplify-color-mode="system"] {
+    --amplify-colors-background-primary: black;
+  }
+}
+
+[data-amplify-color-mode="dark"] {
+  --amplify-colors-background-primary: black;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

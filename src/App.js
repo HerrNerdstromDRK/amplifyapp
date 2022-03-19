@@ -3,10 +3,10 @@ import "./App.css";
 
 import { Amplify, API } from "aws-amplify";
 
-import {
-  Authenticator,
-  withAuthenticator /*useAuthenticator*/,
-} from "@aws-amplify/ui-react";
+//import {
+//  Authenticator,
+//  withAuthenticator /*useAuthenticator*/,
+//} from "@aws-amplify/ui-react";
 
 import { listBlogPosts } from "./graphql/queries";
 import {
@@ -16,17 +16,21 @@ import {
 } from "./graphql/mutations.js";
 
 import {
+  useTheme,
+  withAuthenticator,
+  Authenticator,
+  Badge,
   Button,
+  ButtonGroup,
   Card,
   Flex,
   Grid,
-  Image,
-  View,
   Heading,
-  Badge,
+  ScrollView,
+  Image,
   Text,
   TextAreaField,
-  useTheme,
+  View,
 } from "@aws-amplify/ui-react";
 
 import "@aws-amplify/ui-react/styles.css";
@@ -40,6 +44,11 @@ const imageURL = "https://picsum.photos/200";
 function App({ signOut, user }) {
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogFormData, setBlogFormData] = useState(blogInitialFormState);
+
+  // viewBlogPost refers to the blogPost currently in the view pane
+  // It is empty by default, but when changed will trigger a state update and redraw.
+  // Once set, a viewBlogPost will always be set unless all blog posts are deleted.
+  const [viewBlogPost, setViewBlogPost] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
   const [updateId, setUpdateId] = useState(0);
 
@@ -120,10 +129,23 @@ function App({ signOut, user }) {
       query: updateBlogPostMutation,
       variables: { input: inputVar },
     });
+
+    // If the blog being updated is also being viewed, update the view also
+    if (updateId === viewBlogPost.id) {
+      setViewBlogPost(blogFormData);
+    }
+
+    // Update all of the blog posts in the Card pane
     fetchBlogPosts();
+
+    // Reset the data area being used to track changes
     setBlogFormData(blogInitialFormState);
-    setIsUpdate(false);
+
+    // Clear Id of the post being updated
     setUpdateId(0);
+
+    // Stop the update process
+    setIsUpdate(false);
   }
 
   async function deleteBlogPost({ id }) {
@@ -135,6 +157,7 @@ function App({ signOut, user }) {
       query: deleteBlogPostMutation,
       variables: { input: { id } },
     });
+    if (viewBlogPost.id === id) setViewBlogPost([]);
   }
 
   /**
@@ -175,7 +198,7 @@ function App({ signOut, user }) {
           labelHidden={false}
           name="blogContent"
           placeholder="Blog Content Goes Here :)"
-          rows="3"
+          rows="8"
           value={blogPostContent}
           wrap="wrap"
           resize="vertical"
@@ -187,6 +210,11 @@ function App({ signOut, user }) {
     );
   }
 
+  /**
+   * Build and return a Card wrapping a single blogPost.
+   * @param {*} blogPost: The individual blog post to wrap in the Card.
+   * @returns
+   */
   function BlogPostCard(blogPost) {
     const { tokens } = useTheme();
     //    console.log(
@@ -220,25 +248,42 @@ function App({ signOut, user }) {
                   Verified
                 </Badge>
               </Flex>
-
-              <Heading level={5}>{blogPost.title}</Heading>
-
-              <Text as="span">{blogPost.content}</Text>
-              <Button
-                variation="primary"
-                size="small"
-                onClick={() => deleteBlogPost(blogPost)}
+              <Heading
+                variation="quiet"
+                maxLength={100}
+                isReadOnly={true}
+                level={5}
               >
-                Delete Blog Post
-              </Button>
-              <Button
-                variation="primary"
-                size="small"
-                isDisabled={isUpdate}
-                onClick={() => initiateBlogPostUpdate(blogPost)}
+                {blogPost.title}
+              </Heading>
+              <TextAreaField
+                variation="quiet"
+                maxLength={100}
+                rows={2}
+                wrap="wrap"
+                width="500px"
+                isReadOnly={true}
+                as="span"
               >
-                Update Blog Post
-              </Button>
+                {blogPost.content.length > 100
+                  ? blogPost.content.substring(0, 99) + "..."
+                  : blogPost.content}
+              </TextAreaField>
+              <ButtonGroup justification="center" variation="primary">
+                <Button size="small" onClick={() => deleteBlogPost(blogPost)}>
+                  Delete Blog Post
+                </Button>
+                <Button
+                  size="small"
+                  isDisabled={isUpdate}
+                  onClick={() => initiateBlogPostUpdate(blogPost)}
+                >
+                  Update Blog Post
+                </Button>
+                <Button size="small" onClick={() => setViewBlogPost(blogPost)}>
+                  View Blog Post
+                </Button>
+              </ButtonGroup>
             </Flex>
           </Flex>
         </Card>
@@ -246,6 +291,9 @@ function App({ signOut, user }) {
     );
   }
 
+  /**
+   * Return the header to be used for each blog page.
+   */
   const getBlogHeader = () => {
     return (
       <>
@@ -271,72 +319,74 @@ function App({ signOut, user }) {
    */
   const renderCreateOrUpdateBlogView = () => {
     console.log("renderCreateOrUpdateBlogView> isUpdate: " + isUpdate);
-    if (isUpdate === true) {
-      console.log(
-        "renderCreateOrUpdateBlogView> updateId: " +
-          updateId +
-          ", blogFormData.title: " +
-          blogFormData.title +
-          ", blogFormData.content: " +
-          blogFormData.content
-      );
-      return (
-        <div className="App">
-          <input
-            onChange={(e) =>
-              setBlogFormData({
-                ...blogFormData,
-                title: e.target.value,
-              })
-            }
-            placeholder="Blog Title"
-            value={blogFormData.title}
-          />
-          {blogContentTextAreaField(blogFormData.content)}
-          <Button variation="primary" size="small" onClick={updateBlogPost}>
-            Update Blog Post
-          </Button>
-        </div>
-      );
-    }
-    // isUpdate is false, meaning this area should be used to create a new blog post
-    else {
-      return (
-        <div className="App">
-          <input
-            onChange={(e) =>
-              setBlogFormData({ ...blogFormData, title: e.target.value })
-            }
-            placeholder="Blog Title"
-            value={blogFormData.title}
-          />
-          {blogContentTextAreaField(blogInitialFormState.content)}
-          <Button variation="primary" size="small" onClick={createBlogPost}>
-            Create Blog Post
-          </Button>
-        </div>
-      );
-    }
+    console.log(
+      "renderCreateOrUpdateBlogView> updateId: " +
+        updateId +
+        ", blogFormData.title: " +
+        blogFormData.title +
+        ", blogFormData.content: " +
+        blogFormData.content
+    );
+    return (
+      <div className="App">
+        <input
+          onChange={(e) =>
+            setBlogFormData({
+              ...blogFormData,
+              title: e.target.value,
+            })
+          }
+          placeholder="Blog Title"
+          value={blogFormData.title}
+        />
+        {blogContentTextAreaField(blogFormData.content)}
+        <Button
+          variation="primary"
+          size="small"
+          onClick={isUpdate ? updateBlogPost : createBlogPost}
+        >
+          {isUpdate ? "Update Blog Post" : "Create Blog Post"}
+        </Button>
+      </div>
+    );
   };
+
+  const { tokens } = useTheme();
 
   return (
     <Authenticator>
       {({ signOut, user }) => (
         <Grid
-          templateColumns="1fr 1fr"
-          templateRows="12rem 12rem 12rem"
+          templateColumns={{ base: "1fr", large: "1fr 1fr" }}
+          templateRows={{ base: "repeat(4, 10rem)", large: "repeat(3, 10rem)" }}
           gap="var(--amplify-space-small)"
         >
-          <View columnSpan={2} backgroundColor="var(--amplify-colors-blue-10)">
+          <View
+            columnSpan={2}
+            backgroundColor={tokens.colors.background.secondary}
+            padding={tokens.space.medium}
+          >
             {getBlogHeader()}
           </View>
-          <View rowSpan={2} backgroundColor="var(--amplify-colors-blue-20)">
-            {" "}
-            <div style={{ marginBottom: 30 }}>
-              {blogPosts.map((blogPost) => BlogPostCard(blogPost))}
-            </div>
+          <View
+            rowSpan={2}
+            backgroundColor={tokens.colors.background.secondary}
+            padding={tokens.space.medium}
+          >
+            {blogPosts.map((blogPost) => BlogPostCard(blogPost))}
           </View>
-          <View backgroundColor="var(--amplify-colors-blue-40)">
+          <ScrollView
+            orientation="vertical"
+            backgroundColor={tokens.colors.background.secondary}
+            padding={tokens.space.medium}
+          >
+            <Text>Title: {viewBlogPost.title}</Text>
+            <Text>Content: {viewBlogPost.content}</Text>
+          </ScrollView>
+          <View
+            backgroundColor={tokens.colors.background.secondary}
+            padding={tokens.space.medium}
+          >
             {renderCreateOrUpdateBlogView()}
           </View>
         </Grid>
