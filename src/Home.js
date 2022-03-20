@@ -3,11 +3,6 @@ import "./App.css";
 
 import { Amplify, API } from "aws-amplify";
 
-//import {
-//  Authenticator,
-//  withAuthenticator /*useAuthenticator*/,
-//} from "@aws-amplify/ui-react";
-
 import { listBlogPosts } from "./graphql/queries";
 import {
   createBlogPost as createBlogPostMutation,
@@ -17,6 +12,7 @@ import {
 
 import {
   useTheme,
+  useAuthenticator,
   withAuthenticator,
   Authenticator,
   Badge,
@@ -41,9 +37,10 @@ const blogInitialFormState = { title: "Blog Title", content: "Blog Content" };
 
 const imageURL = "https://picsum.photos/200";
 
-function App({ signOut, user }) {
+export default function Home() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogFormData, setBlogFormData] = useState(blogInitialFormState);
+  const { user, signOut } = useAuthenticator((context) => [context.user]);
 
   // viewBlogPost refers to the blogPost currently in the view pane
   // It is empty by default, but when changed will trigger a state update and redraw.
@@ -387,4 +384,3 @@ function App({ signOut, user }) {
     </Grid>
   );
 }
-export default withAuthenticator(App);

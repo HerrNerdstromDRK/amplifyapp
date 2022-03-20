@@ -1,12 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
+import AppNavigation from "./AppNavigation";
 import reportWebVitals from "./reportWebVitals";
 import Amplify from "aws-amplify";
 import config from "./aws-exports";
 
-import { defaultTheme, AmplifyProvider } from "@aws-amplify/ui-react";
+import {
+  defaultTheme,
+  AmplifyProvider,
+  Authenticator,
+} from "@aws-amplify/ui-react";
 Amplify.configure(config);
 
 // Step 1: Create a new Theme with your custom values
@@ -36,9 +40,7 @@ const theme = {
 
 ReactDOM.render(
   <React.StrictMode>
-    <AmplifyProvider theme={theme}>
-      <App />
-    </AmplifyProvider>
+    <AppNavigation />
   </React.StrictMode>,
   document.getElementById("root")
 );
