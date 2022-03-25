@@ -47,9 +47,6 @@ function IsAuthenticated() {
 export default function Home() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [blogFormData, setBlogFormData] = useState(blogInitialFormState);
-  const { user, signOut } = useAuthenticator((context) => [context.user]);
-  const { route } = useAuthenticator((context) => [context.route]);
-  const navigate = useNavigate();
 
   // viewBlogPost refers to the blogPost currently in the view pane
   // It is empty by default, but when changed will trigger a state update and redraw.
@@ -63,6 +60,12 @@ export default function Home() {
   // The Id for the blog entry being updated. Corresponds to isUpdate -- is 0 when
   // no update is being made, and the Id when an update is being made.
   const [updateId, setUpdateId] = useState(0);
+
+  const { tokens } = useTheme();
+
+  const { user, signOut } = useAuthenticator((context) => [context.user]);
+  const { route } = useAuthenticator((context) => [context.route]);
+  const navigate = useNavigate();
 
   // useEffect() is called whenever the DOM is updated
   // Use it here to refresh our display
@@ -100,6 +103,8 @@ export default function Home() {
 
     // Convenience variable to store all of the blog post items
     const blogPostsFromAPI = apiData.data.listBlogPosts.items;
+
+    //    console.log("fetchBlogPosts> blogPostsFromAPI: " + blogPostsFromAPI);
 
     // Update the local cop of the blogPosts using the API pull
     setBlogPosts(blogPostsFromAPI);
@@ -153,7 +158,7 @@ export default function Home() {
    * Update a blog post.
    */
   async function updateBlogPost() {
-    console.log(
+    /*    console.log(
       "updateBlogPost> title: " +
         blogFormData.title +
         ", content: " +
@@ -161,6 +166,19 @@ export default function Home() {
         ", id: " +
         updateId
     );
+*/
+
+    // Note: Resetting the updateBlog form areas to prevent this area from being locked
+    // in the event of an authentication failure during the backend update process
+
+    // Reset the data area being used to track changes
+    setBlogFormData(blogInitialFormState);
+
+    // Clear Id of the post being updated
+    setUpdateId(0);
+
+    // Stop the update process
+    setIsUpdate(false);
 
     // Gather the information about the blog post being updated -- new
     // title, new content, and the Id of the entry
@@ -183,15 +201,6 @@ export default function Home() {
 
     // Update all of the blog posts in the Card pane
     fetchBlogPosts();
-
-    // Reset the data area being used to track changes
-    setBlogFormData(blogInitialFormState);
-
-    // Clear Id of the post being updated
-    setUpdateId(0);
-
-    // Stop the update process
-    setIsUpdate(false);
   }
 
   /**
@@ -273,7 +282,6 @@ export default function Home() {
    * @returns
    */
   function BlogPostCard(blogPost) {
-    const { tokens } = useTheme();
     //    console.log(
     //      "BlogPostCard> blogPost.title: " +
     //        blogPost.title +
@@ -300,6 +308,9 @@ export default function Home() {
               <Flex>
                 <Badge size="small" variation="info">
                   Created: {new Date(blogPost.createdAt).toString()}
+                </Badge>
+                <Badge size="small" variation="info">
+                  Owner: {blogPost.owner}
                 </Badge>
               </Flex>
               <Heading variation="quiet" maxLength={100} level={5}>
@@ -410,6 +421,7 @@ export default function Home() {
    */
   const renderCreateOrUpdateBlogView = () => {
     console.log("renderCreateOrUpdateBlogView> isUpdate: " + isUpdate);
+    /*
     console.log(
       "renderCreateOrUpdateBlogView> updateId: " +
         updateId +
@@ -418,6 +430,7 @@ export default function Home() {
         ", blogFormData.content: " +
         blogFormData.content
     );
+*/
     return (
       <div className="App">
         <input
@@ -441,8 +454,6 @@ export default function Home() {
       </div>
     );
   };
-
-  const { tokens } = useTheme();
 
   return (
     <Grid
